@@ -29,5 +29,9 @@ def send_reply(bot, text):
     bot.interface.sendText(text, channelIndex=bot.channel_index)
     print(f"→ Replied on channel {bot.channel_index}")
 
+def send_node_reply(bot, text, nodeId, nodeName):
+    bot.interface.sendText(text, destinationId=nodeId)
+    print(f"→ Replied to {nodeName}") 
+
 def is_admin(sender_id):
     return sender_id in ADMIN_NODES
