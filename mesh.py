@@ -5,7 +5,7 @@ from commands import COMMANDS
 from bot import BotState, send_reply
 from config import SERIAL_PORT, PRIVATE_CHANNEL_NAME
 
-interface = meshtastic.serial_interface.SerialInterface(SERIAL_PORT)
+interface = meshtastic.serial_interface.SerialInterface()
 interface.localNode.waitForConfig()
 
 private_channel_index = 1
@@ -18,7 +18,8 @@ for ch in interface.localNode.channels or []:
 bot = BotState(interface, private_channel_index)
 
 def on_receive(packet, interface):
-    print("hit command handler")
+    print("packet: ", packet)
+    print("\n")
     decoded = packet.get("decoded")
     if not decoded:
         return
@@ -27,6 +28,11 @@ def on_receive(packet, interface):
         return
     
     text = decoded.get("text", "").strip()
+    
+    ## catch any test message
+    if text.upper().replace(" ", "") == "TEST":
+        text = "!test"
+    
     if not text.startswith("!"):
         return
     
@@ -42,6 +48,9 @@ def on_receive(packet, interface):
     parts = text[1:].split()
     command = parts[0].upper()
     args = parts[1:]
+
+    if command == "TEST":
+        args = packet
 
     handler = COMMANDS.get(command)
     if not handler:
